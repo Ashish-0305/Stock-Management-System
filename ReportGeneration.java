@@ -27,7 +27,7 @@ public class ReportGeneration {
             FROM
                 TRANSACTIONS t
             JOIN
-                CUSTOMERSSS c ON t.CUST_ID = c.CUST_ID
+                CUSTOMERSS c ON t.CUST_ID = c.CUST_ID
             JOIN
                 STOCKS s ON t.STOCK_ID = s.STOCK_ID
             ORDER BY t.TXN_TYPE
@@ -40,7 +40,7 @@ public class ReportGeneration {
         String sql = """
             SELECT c.CUST_ID, c.FIRST_NAME, c.LAST_NAME, SUM(t.QTY * s.STOCK_PRICE) AS ASSET_VALUE
             FROM TRANSACTIONS t
-            JOIN CUSTOMERSSS c ON t.CUST_ID = c.CUST_ID
+            JOIN CUSTOMERSS c ON t.CUST_ID = c.CUST_ID
             JOIN STOCKS s ON t.STOCK_ID = s.STOCK_ID
             GROUP BY c.CUST_ID, c.FIRST_NAME, c.LAST_NAME
             ORDER BY ASSET_VALUE DESC
@@ -54,7 +54,7 @@ public class ReportGeneration {
         String sql = """
             SELECT c.CUST_ID, c.FIRST_NAME, c.LAST_NAME, SUM(t.QTY * s.STOCK_PRICE) AS ASSET_VALUE
             FROM TRANSACTIONS t
-            JOIN CUSTOMERSSS c ON t.CUST_ID = c.CUST_ID
+            JOIN CUSTOMERSS c ON t.CUST_ID = c.CUST_ID
             JOIN STOCKS s ON t.STOCK_ID = s.STOCK_ID
             GROUP BY c.CUST_ID, c.FIRST_NAME, c.LAST_NAME
             ORDER BY ASSET_VALUE ASC
@@ -135,7 +135,7 @@ public class ReportGeneration {
             SELECT c.FIRST_NAME, c.LAST_NAME, s.STOCK_NAME, s.STOCK_PRICE
             FROM TRANSACTIONS t
             JOIN STOCKS s ON t.STOCK_ID = s.STOCK_ID
-            JOIN CUSTOMERSSS c ON t.CUST_ID = c.CUST_ID
+            JOIN CUSTOMERSS c ON t.CUST_ID = c.CUST_ID
             WHERE s.STOCK_PRICE = (SELECT MIN(STOCK_PRICE) FROM STOCKS)
         """;
         return jdbcTemplate.queryForList(sql);
@@ -143,7 +143,7 @@ public class ReportGeneration {
 
     // 11. All customer details
     public List<Map<String, Object>> allCustomers() {
-        String sql = "SELECT * FROM CUSTOMERSSS";
+        String sql = "SELECT * FROM CUSTOMERSS";
         return jdbcTemplate.queryForList(sql);
     }
 
@@ -170,4 +170,5 @@ public class ReportGeneration {
         String sql = "SELECT SUM(t.QTY * s.STOCK_PRICE) AS TOTAL_ASSETS FROM TRANSACTIONS t JOIN STOCKS s ON t.STOCK_ID = s.STOCK_ID";
         return jdbcTemplate.queryForMap(sql);
     }
+
 }
