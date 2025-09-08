@@ -1,6 +1,52 @@
 <div class="oj-hybrid-padding">
-  <button data-bind="click: listTransaction">List Transactions</button><br><br>
-  <div>
+  <div style="margin-bottom: 12px;">
+    <button data-bind="click: showListForm">List Transactions</button>
+    <button data-bind="click: showDeleteForm" style="margin-left: 12px;">Delete Transaction</button>
+    <button data-bind="click: showUpdateForm" style="margin-left: 12px;">Update Transaction</button>
+  </div>
+
+  <div data-bind="if: deleteFormVisible">
+    <h2>Delete Transaction</h2>
+    <div style="margin-bottom: 12px;">
+      <label>Transaction ID to Delete:
+        <input type="number" data-bind="value: txnIdToDelete">
+      </label>
+      <button data-bind="click: submitDelete" style="margin-left: 12px;">Submit Delete</button>
+    </div>
+  </div>
+
+  <div data-bind="if: updateFormVisible">
+    <h2>Update Transaction</h2>
+    <div style="margin-bottom: 12px;">
+      <label>Transaction ID (required):
+        <input type="number" data-bind="value: txnIdToUpdate">
+      </label>
+    </div>
+    <div style="margin-bottom: 12px;">
+      <label>Customer ID:
+        <input type="number" data-bind="value: updateForm.custId">
+      </label>
+      <label style="margin-left: 12px;">Stock ID:
+        <input type="number" data-bind="value: updateForm.stockId">
+      </label>
+      <label style="margin-left: 12px;">Price:
+        <input type="number" step="0.01" data-bind="value: updateForm.txnPrice">
+      </label>
+      <label style="margin-left: 12px;">Type:
+        <input type="text" data-bind="value: updateForm.txnType">
+      </label>
+      <label style="margin-left: 12px;">Quantity:
+        <input type="number" data-bind="value: updateForm.qty">
+      </label>
+      <label style="margin-left: 12px;">Date:
+        <input type="text" data-bind="value: updateForm.txnDate">
+      </label>
+    </div>
+    <button data-bind="click: submitUpdate">Submit Update</button>
+  </div>
+
+  <div data-bind="if: listFormVisible">
+    <h2>Transaction List</h2>
     <table border="3">
       <caption>Transaction List</caption>
       <thead>
