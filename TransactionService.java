@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 public class TransactionService {
     @Autowired
@@ -13,12 +15,14 @@ public class TransactionService {
         return transactionDAO.addATransaction(newTransaction);
     }
 
-    public ResponseEntity<Object> fetchAllTransactions() {
-        return ResponseEntity.status(200).body(transactionDAO.fetchAllTransactions());
+    // CRITICAL FIX: The method now directly returns the ResponseEntity from the DAO.
+    public ResponseEntity<ArrayList<Transaction>> fetchAllTransactions() {
+        return transactionDAO.fetchAllTransactions();
     }
 
-    public ResponseEntity<Object> fetchTransactionById(int txnId) {
-        return transactionDAO.fetchTransactionById(txnId);
+    // CRITICAL FIX: The method now correctly returns ResponseEntity<ArrayList<Transaction>>.
+    public ResponseEntity<ArrayList<Transaction>> fetchTransactionsByCustId(int custId) {
+        return transactionDAO.fetchTransactionsByCustId(custId);
     }
 
     public ResponseEntity<Object> updateTransactionById(int txnId, Transaction updatedTransaction) {
