@@ -9,7 +9,7 @@ public class Transaction {
     private double txnPrice;
     private String txnType;
     private int qty;
-    private Date txnDate;
+    private java.util.Date txnDate;
 
     public Transaction() {
         super();
@@ -74,11 +74,11 @@ public class Transaction {
         this.qty = qty;
     }
 
-    public Date getTxnDate() {
+    public java.util.Date getTxnDate() {
         return txnDate;
     }
 
-    public void setTxnDate(Date txnDate) {
+    public void setTxnDate(java.util.Date txnDate) {
         this.txnDate = txnDate;
     }
 }
