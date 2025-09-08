@@ -1,0 +1,30 @@
+<div class="oj-hybrid-padding">
+  <button data-bind="click: listTransaction">List Transactions</button><br><br>
+  <div>
+    <table border="3">
+      <caption>Transaction List</caption>
+      <thead>
+        <tr>
+          <th>Transaction ID</th>
+          <th>Customer ID</th>
+          <th>Stock ID</th>
+          <th>Transaction Price</th>
+          <th>Transaction Type</th>
+          <th>Quantity</th>
+          <th>Transaction Date</th>
+        </tr>
+      </thead>
+      <tbody data-bind="foreach: transactions">
+        <tr>
+          <td><span data-bind="text: txnId"></span></td>
+          <td><span data-bind="text: custId"></span></td>
+          <td><span data-bind="text: stockId"></span></td>
+          <td><span data-bind="text: txnPrice"></span></td>
+          <td><span data-bind="text: txnType"></span></td>
+          <td><span data-bind="text: qty"></span></td>
+          <td><span data-bind="text: txnDate"></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

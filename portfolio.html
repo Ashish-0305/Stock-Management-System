@@ -1,0 +1,71 @@
+<div>
+  <h2>My Portfolio</h2>
+  <table border="1" style="border-collapse:collapse;width:100%;margin-bottom:20px;">
+    <thead>
+      <tr>
+        <th>Stock ID</th>
+        <th>Stock Name</th>
+        <th>Stock Price</th>
+        <th>Total Bought</th>
+        <th>Total Sold</th>
+        <th>Net Holding</th>
+        <th>Current Value</th>
+        <th>Sell</th>
+      </tr>
+    </thead>
+    <tbody data-bind="foreach: portfolio">
+      <tr>
+        <td data-bind="text: stockId"></td>
+        <td data-bind="text: stockName"></td>
+        <td data-bind="text: stockPrice"></td>
+        <td data-bind="text: totalBought"></td>
+        <td data-bind="text: totalSold"></td>
+        <td data-bind="text: netHolding"></td>
+        <td data-bind="text: currentValue"></td>
+        <td>
+         <button data-bind="click: $parent.sellStock">Sell</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div data-bind="visible: sellMsg, text: sellMsg" style="color:green;margin-bottom:6px;"></div>
+  <div data-bind="visible: sellError, text: sellError" style="color:red;margin-bottom:6px;"></div>
+  <div data-bind="if: showSellForm">
+    <h3>Sell <span data-bind="text: sellStockName"></span></h3>
+    <form data-bind="submit: confirmSell">
+      <label>
+        Quantity (max <span data-bind="text: sellMaxQty"></span>):
+        <input type="number" data-bind="value: sellQty" min="1" required>
+      </label>
+      <button type="submit">Confirm Sell</button>
+      <button type="button" data-bind="click: hideSellForm">Cancel</button>
+    </form>
+  </div>
+</div>
+<button data-bind="click: toggleTxnHistory, text: txnHistoryVisible() ? 'Hide Transaction History' : 'Show Transaction History'"></button>
+
+<div data-bind="visible: txnHistoryVisible" style="margin-top:16px;">
+  <h3>Transaction History</h3>
+  <table border="1" style="border-collapse:collapse;width:100%;">
+    <thead>
+      <tr>
+        <th>Txn ID</th>
+        <th>Stock ID</th>
+        <th>Txn Price</th>
+        <th>Txn Type</th>
+        <th>Quantity</th>
+        <th>Txn Date</th>
+      </tr>
+    </thead>
+    <tbody data-bind="foreach: transactionHistory">
+      <tr>
+        <td data-bind="text: txnId"></td>
+        <td data-bind="text: stockId"></td>
+        <td data-bind="text: txnPrice"></td>
+        <td data-bind="text: txnType"></td>
+        <td data-bind="text: qty"></td>
+        <td data-bind="text: txnDate"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

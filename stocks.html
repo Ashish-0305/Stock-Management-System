@@ -1,0 +1,73 @@
+<div class="oj-hybrid-padding">
+  <div class="button-container">
+    <button data-bind="click: showAddForm, disable: busy">Add Stock</button>
+    <button data-bind="click: showListForm, disable: busy">List Stocks</button>
+    <button data-bind="click: showDeleteForm, disable: busy">Delete Stock</button>
+    <button data-bind="click: showUpdateForm, disable: busy">Update Stock</button>
+  </div>
+
+  <div data-bind="if: addFormVisible">
+    <h2>Add Stock</h2>
+    <div class="form-grid">
+      <label>Id: <input type="number" data-bind="value: newStock.stockId"></label>
+      <label>Name: <input type="text" data-bind="value: newStock.stockName"></label>
+      <label>Price: <input type="number" step="0.01" data-bind="value: newStock.stockPrice"></label>
+      <label>Volume: <input type="number" data-bind="value: newStock.stockVolume"></label>
+      <label>Listing Price: <input type="number" step="0.01" data-bind="value: newStock.listingPrice"></label>
+      <label>Exchange: <input type="text" data-bind="value: newStock.listedExchange"></label>
+    </div>
+    <button data-bind="click: submitAdd, disable: busy">Submit Add</button>
+  </div>
+
+  <div data-bind="if: deleteFormVisible">
+    <h2>Delete Stock</h2>
+    <div class="delete-container">
+      <label>Stock ID to Delete: <input type="number" data-bind="value: stockIdToDelete"></label>
+    </div>
+    <button data-bind="click: submitDelete, disable: busy">Submit Delete</button>
+  </div>
+
+  <div data-bind="if: updateFormVisible">
+    <legend>Update Stock</legend>
+    <div class="form-grid">
+      <label>Stock ID (required): <input type="number" data-bind="value: stockIdToUpdate"></label>
+      <label>Name: <input type="text" data-bind="value: form.stockName"></label>
+      <label>Price: <input type="number" step="0.01" data-bind="value: form.stockPrice"></label>
+      <label>Volume: <input type="number" data-bind="value: form.stockVolume"></label>
+      <label>Listing Price: <input type="number" step="0.01" data-bind="value: form.listingPrice"></label>
+      <label>Exchange: <input type="text" data-bind="value: form.listedExchange"></label>
+    </div>
+    <button data-bind="click: submitUpdate, disable: busy">Submit Update</button>
+  </div>
+
+  <div data-bind="if: listFormVisible">
+    <h2>Stock List</h2>
+    <div class="table-container">
+      <table border="1" class="stock-table">
+        <caption>Stock List</caption>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Stock Name</th>
+            <th>Stock Price</th>
+            <th>Stock Volume</th>
+            <th>Listing Price</th>
+            <th>Listed Exchange</th>
+            <th>Listed Date</th>
+          </tr>
+        </thead>
+        <tbody data-bind="foreach: stocks">
+          <tr>
+            <td><span data-bind="text: stockId"></span></td>
+            <td><span data-bind="text: stockName"></span></td>
+            <td><span data-bind="text: stockPrice"></span></td>
+            <td><span data-bind="text: stockVolume"></span></td>
+            <td><span data-bind="text: listingPrice"></span></td>
+            <td><span data-bind="text: listedExchange"></span></td>
+            <td><span data-bind="text: listedDate"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,55 @@
+<div class="oj-hybrid-padding">
+  <h1>Dashboard Content Area</h1>
+  <div>
+      <button data-bind="click:toggleStocks">All available Stocks</button>
+  
+        <div data-bind="visible:showTable">
+          <h3>Stocks table</h3>
+<table border="3" >
+  <thead>
+    <tr>
+      <th>Stock ID</th>
+      <th>Stock Name</th>
+      <th>Stock Price</th>
+      <th>Stock Volume</th>
+      <th>Listed Price</th>
+      <th>Listed Date</th>
+      <th>Listed Exchange</th>
+    </tr>
+  </thead>
+  <tbody data-bind="foreach: stocks">
+    <tr>
+      <td data-bind="text: stockId"></td>
+      <td data-bind="text: stockName"></td>
+      <td data-bind="text: stockPrice"></td>
+      <td data-bind="text: stockVolume"></td>
+      <td data-bind="text: listingPrice"></td>
+       <td data-bind="text: listedDate"></td>
+       <td data-bind="text:listedExchange "></td>
+
+    </tr>
+    
+  </tbody>
+</table>
+</div>
+<!-- Toggle Buy Stock Button -->
+<button data-bind="click: toggleBuyStock, text: buyStockVisible() ? 'Hide Buy Stock' : 'Buy Stock'"></button>
+
+<!-- Buy Stock Form/Panel -->
+<div data-bind="visible: buyStockVisible" style="margin-top:20px; border:1px solid #ccc; padding:18px; border-radius:8px;">
+  <h3>Buy Stock</h3>
+  <form data-bind="submit: doBuyStock">
+    <label>
+      Stock:
+            <input type="number" data-bind="value: buyStockId" required>
+    <label>
+      Quantity:
+      <input type="number" data-bind="value: buyQty" required>
+    </label><br>
+    <button type="submit">Buy</button>
+  </form>
+  <div style="color:red;" data-bind="visible: buyError, text: buyError"></div>
+  <div data-bind="visible: buyMessage" style="color:green;">
+    <span data-bind="text: buyMessage"></span>
+  </div>
+</div>

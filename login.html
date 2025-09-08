@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication</title>
+  <style>
+    .auth-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+  
+    .auth-wrapper {
+      width: 100%;
+      max-width: 400px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+  
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+    }
+  
+    .tab {
+      flex: 1;
+      padding: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: #888;
+      outline: none;
+    }
+  
+    .tab.active {
+      color: #007bff;
+      border-bottom: 2px solid #007bff;
+    }
+  
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+    }
+  
+    .field-group {
+      margin-bottom: 15px;
+    }
+  
+    .field {
+      margin-bottom: 15px;
+    }
+  
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #333;
+    }
+  
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+  
+    input:focus, select:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+    }
+  
+    .error {
+      color: red;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+  
+    .forgot-link {
+      text-align: right;
+      margin-bottom: 15px;
+    }
+  
+    .forgot-link a {
+      color: #007bff;
+      text-decoration: none;
+      font-size: 14px;
+    }
+  
+    .forgot-link a:hover {
+      text-decoration: underline;
+    }
+  
+    .submit-btn {
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+  
+    .submit-btn:hover {
+      background-color: #0056b3;
+    }
+  
+    .submit-btn[disabled] {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-wrapper">
+      <!-- Tabs for switching between Login and Sign Up -->
+      <div class="auth-tabs">
+        <button type="button" class="tab" data-bind="click: () => activeTab('login'), css: { active: activeTab() === 'login' }">
+          Login
+        </button>
+        <button type="button" class="tab" data-bind="click: () => activeTab('signup'), css: { active: activeTab() === 'signup' }">
+          Sign Up
+        </button>
+      </div>
+  
+      <!-- Form for both Login and Sign Up -->
+      <form class="auth-form" data-bind="submit: handleSubmit">
+        <!-- Sign Up Fields -->
+        <div class="field-group" data-bind="visible: activeTab() === 'signup'">
+          <div class="field">
+            <label for="firstName">First Name*</label>
+            <input id="firstName" type="text" placeholder="First Name" data-bind="value: firstName, valueUpdate: 'afterkeydown'">
+            <div class="error" data-bind="visible: firstNameError, text: firstNameError"></div>
+          </div>
+          <div class="field">
+            <label for="lastName">Last Name*</label>
+            <input id="lastName" type="text" placeholder="Last Name" data-bind="value: lastName, valueUpdate: 'afterkeydown'">
+            <div class="error" data-bind="visible: lastNameError, text: lastNameError"></div>
+          </div>
+          <div class="field">
+            <label for="emailId">Email*</label>
+            <input id="emailId" type="email" placeholder="Email" data-bind="value: emailId, valueUpdate: 'afterkeydown'">
+            <div class="error" data-bind="visible: emailIdError, text: emailIdError"></div>
+          </div>
+          <div class="field">
+            <label for="city">City*</label>
+            <input id="city" type="text" placeholder="City" data-bind="value: city, valueUpdate: 'afterkeydown'">
+            <div class="error" data-bind="visible: cityError, text: cityError"></div>
+          </div>
+          <div class="field">
+            <label for="phone">Phone Number*</label>
+            <input id="phone" type="tel" placeholder="Phone Number" data-bind="value: phone, valueUpdate: 'afterkeydown'">
+            <div class="error" data-bind="visible: phoneError, text: phoneError"></div>
+          </div>
+          <div class="field">
+            <label for="userType">User Type*</label>
+            <select id="userType" data-bind="value: userType, valueUpdate: 'afterkeydown'">
+              <option value="">Select User Type</option>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+            <div class="error" data-bind="visible: userTypeError, text: userTypeError"></div>
+          </div>
+        </div>
+  
+        <!-- Common Fields for Login and Sign Up -->
+        <div class="field">
+          <label for="username">Username*</label>
+          <input id="username" type="text" placeholder="Username" autocomplete="username" data-bind="value: username, valueUpdate: 'afterkeydown'">
+          <div class="error" data-bind="visible: usernameError, text: usernameError"></div>
+        </div>
+        <div class="field" data-bind="visible: activeTab() === 'login'">
+        <label for="loginUserType">User Type*</label>
+        <select id="loginUserType" data-bind="value: userType, valueUpdate: 'afterkeydown'">
+        <option value="">Select User Type</option>
+        <option value="user">User</option>
+        <option value="admin">Admin</option>
+        </select>
+        <div class="error" data-bind="visible: userTypeError, text: userTypeError"></div>
+        </div>
+        <div class="field">
+          <label for="password">Password*</label>
+          <input id="password" type="password" placeholder="Password" autocomplete="current-password" data-bind="value: password, valueUpdate: 'afterkeydown'">
+          <div class="error" data-bind="visible: passwordError, text: passwordError"></div>
+        </div>
+  
+        <!-- Forgot Password Link (for Login) -->
+        <div class="forgot-link" data-bind="visible: activeTab() === 'login'">
+          <a href="#" data-bind="click: forgotPassword">Forgot Password?</a>
+        </div>
+  
+        <!-- Submit Button -->
+        <button type="submit" class="submit-btn" data-bind="enable: !busy(), text: activeTab() === 'login' ? 'Login' : 'Sign Up'"></button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
