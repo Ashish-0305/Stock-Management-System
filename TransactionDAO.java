@@ -1,6 +1,8 @@
 package com.example.demo;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +31,16 @@ public class TransactionDAO extends JdbcDaoSupport {
 
     public ResponseEntity<Object> addATransaction(Transaction newTransaction) {
         JdbcTemplate jdbcTemplate = giveJdbcTemplate();
-        int rowsAffected = jdbcTemplate.update("INSERT INTO TRANSACTIONS (TXN_ID, CUST_ID, STOCK_ID, TXN_PRICE, TXN_TYPE, QTY, TXN_DATE) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                newTransaction.getTxnId(), newTransaction.getCustId(), newTransaction.getStockId(), 
-                newTransaction.getTxnPrice(), newTransaction.getTxnType(), newTransaction.getQty(), newTransaction.getTxnDate());
+        int rowsAffected = jdbcTemplate.update(
+            // CRITICAL FIX: Explicitly use the sequence's next value
+            "INSERT INTO TRANSACTIONS (TXN_ID, CUST_ID, STOCK_ID, TXN_PRICE, TXN_TYPE, QTY, TXN_DATE) VALUES (TXN_ID_SEQ.NEXTVAL, ?, ?, ?, ?, ?, ?)",
+            newTransaction.getCustId(),
+            newTransaction.getStockId(),
+            newTransaction.getTxnPrice(),
+            newTransaction.getTxnType(),
+            newTransaction.getQty(),
+            newTransaction.getTxnDate()
+        );
         if (rowsAffected > 0)
             return ResponseEntity.status(201).body("Transaction added successfully");
         else
@@ -43,95 +52,116 @@ public class TransactionDAO extends JdbcDaoSupport {
         JdbcTemplate jdbcTemplate = giveJdbcTemplate();
         String sql = "SELECT * FROM TRANSACTIONS";
         List<Map<String, Object>> allTransactions = jdbcTemplate.queryForList(sql);
-
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         for (Map<String, Object> txn : allTransactions) {
             try {
                 Transaction t = new Transaction();
-
                 Object txnIdObj = txn.get("TXN_ID");
                 if (txnIdObj != null) {
                     t.setTxnId(Integer.valueOf(txnIdObj.toString()));
                 } else {
                     System.out.println("TXN_ID is null for a row");
-                    continue; // Skip this row or handle as needed
+                    continue;
                 }
-
                 Object custIdObj = txn.get("CUST_ID");
                 t.setCustId(custIdObj != null ? Integer.valueOf(custIdObj.toString()) : 0);
-
                 Object stockIdObj = txn.get("STOCK_ID");
                 t.setStockId(stockIdObj != null ? Integer.valueOf(stockIdObj.toString()) : 0);
-
                 Object txnPriceObj = txn.get("TXN_PRICE");
                 t.setTxnPrice(txnPriceObj != null ? Double.valueOf(txnPriceObj.toString()) : 0.0);
-
                 Object txnTypeObj = txn.get("TXN_TYPE");
                 t.setTxnType(txnTypeObj != null ? txnTypeObj.toString() : "");
-
                 Object qtyObj = txn.get("QTY");
                 t.setQty(qtyObj != null ? Integer.valueOf(qtyObj.toString()) : 0);
-
                 Object txnDateObj = txn.get("TXN_DATE");
-                t.setTxnDate(txnDateObj instanceof Date ? (Date) txnDateObj : null);
-
+                if (txnDateObj != null) {
+                    if (txnDateObj instanceof Date) {
+                        t.setTxnDate((Date) txnDateObj);
+                    } else if (txnDateObj instanceof Timestamp) {
+                        t.setTxnDate(new Date(((Timestamp) txnDateObj).getTime()));
+                    } else if (txnDateObj instanceof java.util.Date) {
+                        t.setTxnDate(new Date(((java.util.Date) txnDateObj).getTime()));
+                    } else {
+                        System.err.println("Unrecognized date type: " + txnDateObj.getClass().getName());
+                        t.setTxnDate(null);
+                    }
+                } else {
+                    t.setTxnDate(null);
+                }
                 allFetchedTransactions.add(t);
             } catch (Exception e) {
                 System.err.println("Error processing row: " + txn);
                 e.printStackTrace();
-                continue; // Skip problematic rows
+                continue;
             }
         }
         return ResponseEntity.status(200).body(allFetchedTransactions);
     }
 
-    public ResponseEntity<Object> fetchTransactionById(int txnId) {
+    public ResponseEntity<ArrayList<Transaction>> fetchTransactionsByCustId(int custId) {
+        ArrayList<Transaction> allFetchedTransactions = new ArrayList<>();
         JdbcTemplate jdbcTemplate = giveJdbcTemplate();
-        String sql = "SELECT * FROM TRANSACTIONS WHERE TXN_ID = ?";
-        List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, txnId);
+        String sql = "SELECT * FROM TRANSACTIONS WHERE CUST_ID = ?";
+        List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, custId);
+        
         if (result.isEmpty()) {
-            return ResponseEntity.status(404).body("Transaction with ID " + txnId + " not found");
+            return ResponseEntity.status(404).body(new ArrayList<Transaction>());
         }
-        Map<String, Object> txn = result.get(0);
-        try {
-            Transaction t = new Transaction();
-
-            Object txnIdObj = txn.get("TXN_ID");
-            if (txnIdObj != null) {
-                t.setTxnId(Integer.valueOf(txnIdObj.toString()));
+        
+        for (Map<String, Object> txn : result) {
+            try {
+                Transaction t = new Transaction();
+                Object txnIdObj = txn.get("TXN_ID");
+                if (txnIdObj != null) {
+                    t.setTxnId(Integer.valueOf(txnIdObj.toString()));
+                }
+                Object custIdObj = txn.get("CUST_ID");
+                t.setCustId(custIdObj != null ? Integer.valueOf(custIdObj.toString()) : 0);
+                Object stockIdObj = txn.get("STOCK_ID");
+                t.setStockId(stockIdObj != null ? Integer.valueOf(stockIdObj.toString()) : 0);
+                Object txnPriceObj = txn.get("TXN_PRICE");
+                t.setTxnPrice(txnPriceObj != null ? Double.valueOf(txnPriceObj.toString()) : 0.0);
+                Object txnTypeObj = txn.get("TXN_TYPE");
+                t.setTxnType(txnTypeObj != null ? txnTypeObj.toString() : "");
+                Object qtyObj = txn.get("QTY");
+                t.setQty(qtyObj != null ? Integer.valueOf(qtyObj.toString()) : 0);
+                Object txnDateObj = txn.get("TXN_DATE");
+                if (txnDateObj != null) {
+                    if (txnDateObj instanceof Date) {
+                        t.setTxnDate((Date) txnDateObj);
+                    } else if (txnDateObj instanceof Timestamp) {
+                        t.setTxnDate(new Date(((Timestamp) txnDateObj).getTime()));
+                    } else if (txnDateObj instanceof java.util.Date) {
+                        t.setTxnDate(new Date(((java.util.Date) txnDateObj).getTime()));
+                    } else {
+                        System.err.println("Unrecognized date type: " + txnDateObj.getClass().getName());
+                        t.setTxnDate(null);
+                    }
+                } else {
+                    t.setTxnDate(null);
+                }
+                allFetchedTransactions.add(t);
+            } catch (Exception e) {
+                System.err.println("Error processing transaction with CUST_ID " + custId + ": " + txn);
+                e.printStackTrace();
+                continue;
             }
-
-            Object custIdObj = txn.get("CUST_ID");
-            t.setCustId(custIdObj != null ? Integer.valueOf(custIdObj.toString()) : 0);
-
-            Object stockIdObj = txn.get("STOCK_ID");
-            t.setStockId(stockIdObj != null ? Integer.valueOf(stockIdObj.toString()) : 0);
-
-            Object txnPriceObj = txn.get("TXN_PRICE");
-            t.setTxnPrice(txnPriceObj != null ? Double.valueOf(txnPriceObj.toString()) : 0.0);
-
-            Object txnTypeObj = txn.get("TXN_TYPE");
-            t.setTxnType(txnTypeObj != null ? txnTypeObj.toString() : "");
-
-            Object qtyObj = txn.get("QTY");
-            t.setQty(qtyObj != null ? Integer.valueOf(qtyObj.toString()) : 0);
-
-            Object txnDateObj = txn.get("TXN_DATE");
-            t.setTxnDate(txnDateObj instanceof Date ? (Date) txnDateObj : null);
-
-            return ResponseEntity.status(200).body(t);
-        } catch (Exception e) {
-            System.err.println("Error processing transaction with ID " + txnId + ": " + txn);
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Error processing transaction data for ID " + txnId);
         }
+        return ResponseEntity.status(200).body(allFetchedTransactions);
     }
 
     public ResponseEntity<Object> updateTransactionById(int txnId, Transaction updatedTransaction) {
         JdbcTemplate jdbcTemplate = giveJdbcTemplate();
         String sql = "UPDATE TRANSACTIONS SET CUST_ID = ?, STOCK_ID = ?, TXN_PRICE = ?, TXN_TYPE = ?, QTY = ?, TXN_DATE = ? WHERE TXN_ID = ?";
         int rowsAffected = jdbcTemplate.update(sql,
-                updatedTransaction.getCustId(), updatedTransaction.getStockId(), updatedTransaction.getTxnPrice(),
-                updatedTransaction.getTxnType(), updatedTransaction.getQty(), updatedTransaction.getTxnDate(), txnId);
+            updatedTransaction.getCustId(),
+            updatedTransaction.getStockId(),
+            updatedTransaction.getTxnPrice(),
+            updatedTransaction.getTxnType(),
+            updatedTransaction.getQty(),
+            updatedTransaction.getTxnDate(),
+            txnId
+        );
         if (rowsAffected > 0) {
             return ResponseEntity.status(200).body("Transaction updated successfully");
         } else {
@@ -146,6 +176,7 @@ public class TransactionDAO extends JdbcDaoSupport {
         boolean hasUpdates = false;
 
         if (partialTransaction.getCustId() != 0) {
+            if (hasUpdates) sql.append(", ");
             sql.append("CUST_ID = ?");
             params.add(partialTransaction.getCustId());
             hasUpdates = true;
@@ -184,8 +215,10 @@ public class TransactionDAO extends JdbcDaoSupport {
         if (!hasUpdates) {
             return ResponseEntity.status(400).body("No fields provided for update");
         }
+        
         sql.append(" WHERE TXN_ID = ?");
         params.add(txnId);
+        
         int rowsAffected = jdbcTemplate.update(sql.toString(), params.toArray());
         if (rowsAffected > 0) {
             return ResponseEntity.status(200).body("Transaction partially updated successfully");
