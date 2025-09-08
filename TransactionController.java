@@ -2,13 +2,17 @@ package com.example.demo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+
 @RestController
+@CrossOrigin(origins = "http://localhost:8000/")
 public class TransactionController {
     @Autowired
     TransactionService transactionService;
@@ -23,16 +27,18 @@ public class TransactionController {
         return transactionService.addATransaction(newTransaction);
     }
 
+    // CRITICAL FIX: The return type is now explicitly ResponseEntity<ArrayList<Transaction>>.
     @RequestMapping(value = "/transactions", method = RequestMethod.GET)
-    public ResponseEntity<Object> fetchAllTransactions() {
+    public ResponseEntity<ArrayList<Transaction>> fetchAllTransactions() {
         System.out.println("Fetching all transactions called from the controller");
         return transactionService.fetchAllTransactions();
     }
 
-    @RequestMapping(value = "/transactions/{txnId}", method = RequestMethod.GET)
-    public ResponseEntity<Object> fetchTransactionById(@PathVariable("txnId") int txnId) {
-        System.out.println("Fetching transaction with ID: " + txnId + " called from the controller");
-        return transactionService.fetchTransactionById(txnId);
+    // CRITICAL FIX: The return type is now explicitly ResponseEntity<ArrayList<Transaction>>.
+    @RequestMapping(value = "/transactions/{custId}", method = RequestMethod.GET)
+    public ResponseEntity<ArrayList<Transaction>> fetchTransactionsByCustId(@PathVariable("custId") int custId) {
+        System.out.println("Fetching transactions with CUST_ID: " + custId + " called from the controller");
+        return transactionService.fetchTransactionsByCustId(custId);
     }
 
     @RequestMapping(value = "/transactions/{txnId}", method = RequestMethod.PUT)
